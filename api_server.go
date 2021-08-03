@@ -9,6 +9,10 @@ import (
 func main() {
 	engine := gin.Default()
 	engine.GET("/procs", controller.ProcList)
+	procEngine := engine.Group("/proc")
+	{
+		procEngine.GET("/mem_maps", controller.ProcMemMaps)
+	}
 	memoryEngine := engine.Group("/memory")
 	{
 		memoryEngine.POST("/write_int", controller.WriteProcMemInt)

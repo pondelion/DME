@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"dme_service/memory_util"
 
@@ -12,7 +13,10 @@ import (
 
 func WriteProcMemInt(c *gin.Context) {
 	pid, _ := strconv.Atoi(c.Query("pid"))
-	addr, _ := strconv.ParseInt(c.Query("addr"), 16, 64)
+	addr, _ := strconv.ParseInt(
+		strings.Replace(c.Query("addr"), "0x", "", -1),
+		16, 64,
+	)
 	value, _ := strconv.ParseInt(c.Query("value"), 10, 64)
 	log.Printf("pid : %d, addr : %#x, value : %d", pid, addr, value)
 	memory_util.WriteProcMemInt(pid, addr, value)
