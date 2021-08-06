@@ -1,10 +1,10 @@
 package model
 
 type MemoryMap struct {
-	ADDR_START  int64  `json:"addr_start"`
-	ADDR_END    int64  `json:"addr_end"`
+	ADDR_START  uint64 `json:"addr_start"`
+	ADDR_END    uint64 `json:"addr_end"`
 	PERMISSIONS string `json:"permissions"`
-	OFFSET      int64  `json:"offset"`
+	OFFSET      uint64 `json:"offset"`
 	PATHNAME    string `json:"pathname"`
 }
 
