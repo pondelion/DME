@@ -15,8 +15,9 @@ func main() {
 	}
 	memoryEngine := engine.Group("/memory")
 	{
-		memoryEngine.POST("/write_int", controller.WriteProcMemInt)
+		memoryEngine.POST("/write_int64", controller.WriteProcMemInt64)
 		memoryEngine.GET("/search_mem_int", controller.SearchMemInt)
+		memoryEngine.GET("/read_memory", controller.ReadMemory)
 	}
 	engine.Run()
 }

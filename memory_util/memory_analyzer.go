@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -52,6 +53,26 @@ func ParseMemMaps(pid int) model.MemoryMaps {
 	return model.MemoryMaps{pid, memoryMaps}
 }
 
+func ReadMemRange(pid int, addrStart uint64, addrEnd uint64) model.MemoryValue {
+	filepath := fmt.Sprintf("/proc/%d/mem", pid)
+	file, err := os.Open(filepath)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	buf := make([]byte, addrEnd-addrStart)
+	file.ReadAt(buf, int64(addrStart))
+
+	memoryValue := model.MemoryValue{
+		PID:          pid,
+		ADDR_START:   addrStart,
+		ADDR_END:     addrEnd,
+		MEMORY_VALUE: buf,
+	}
+	return memoryValue
+}
+
 func SearchMemIntRange(pid int, value int64, addrStart uint64, addrEnd uint64) []uint64 {
 	return searchMemIntRange(pid, value, addrStart, addrEnd)
 }
@@ -85,15 +106,14 @@ func searchMemIntRange(pid int, value int64, addrStart uint64, addrEnd uint64) [
 	var foundAddrs []uint64
 	buf := make([]byte, 64)
 	for addr < addrEnd {
-		if err != nil {
-			panic(err)
-		}
 		file.ReadAt(buf, int64(addr))
-		readValue := int64(binary.LittleEndian.Uint64(buf))
-		if readValue == value {
+		readValueInt64 := int64(binary.LittleEndian.Uint64(buf))
+		readValueInt32 := int32(binary.LittleEndian.Uint32(buf))
+		if readValueInt64 == value || readValueInt32 == int32(value) {
+			log.Printf("addr : %#x : %d", addr, readValueInt64)
 			foundAddrs = append(foundAddrs, addr)
 		}
-		addr += 8
+		addr += 1
 	}
 	return foundAddrs
 }

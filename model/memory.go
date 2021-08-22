@@ -12,3 +12,10 @@ type MemoryMaps struct {
 	PID      int         `json:"pid"`
 	MEM_MAPS []MemoryMap `json:"mem_maps"`
 }
+
+type MemoryValue struct {
+	PID          int    `json:"pid"`
+	ADDR_START   uint64 `json:"addr_start"`
+	ADDR_END     uint64 `json:"addr_end"`
+	MEMORY_VALUE []byte `json:"memory_value"`
+}
