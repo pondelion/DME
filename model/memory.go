@@ -14,8 +14,9 @@ type MemoryMaps struct {
 }
 
 type MemoryValue struct {
-	PID          int    `json:"pid"`
-	ADDR_START   uint64 `json:"addr_start"`
-	ADDR_END     uint64 `json:"addr_end"`
-	MEMORY_VALUE []byte `json:"memory_value"`
+	PID        int    `json:"pid"`
+	ADDR_START uint64 `json:"addr_start"`
+	ADDR_END   uint64 `json:"addr_end"`
+	// MEMORY_VALUE []byte `json:"memory_value"`
+	MEMORY_VALUE string `json:"memory_value"`
 }

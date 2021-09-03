@@ -1,8 +1,9 @@
-package memory_util
+package util
 
 import (
 	"bufio"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
@@ -61,14 +62,19 @@ func ReadMemRange(pid int, addrStart uint64, addrEnd uint64) model.MemoryValue {
 	}
 	defer file.Close()
 
-	buf := make([]byte, addrEnd-addrStart)
+	buf := make([]byte, addrEnd-addrStart+1)
 	file.ReadAt(buf, int64(addrStart))
 
+	// hexStr := hex.Dump(buf)
+
+	hexStr := hex.EncodeToString(buf)
+
 	memoryValue := model.MemoryValue{
-		PID:          pid,
-		ADDR_START:   addrStart,
-		ADDR_END:     addrEnd,
-		MEMORY_VALUE: buf,
+		PID:        pid,
+		ADDR_START: addrStart,
+		ADDR_END:   addrEnd,
+		// MEMORY_VALUE: buf,
+		MEMORY_VALUE: hexStr,
 	}
 	return memoryValue
 }
@@ -116,4 +122,14 @@ func searchMemIntRange(pid int, value int64, addrStart uint64, addrEnd uint64) [
 		addr += 1
 	}
 	return foundAddrs
+}
+
+func Addr2MemMap(pid int, addr uint64) *model.MemoryMap {
+	memMaps := ParseMemMaps(pid)
+	for _, memMap := range memMaps.MEM_MAPS {
+		if addr >= memMap.ADDR_START && addr <= memMap.ADDR_END {
+			return &memMap
+		}
+	}
+	return nil
 }

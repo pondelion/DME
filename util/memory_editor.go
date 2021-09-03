@@ -1,4 +1,4 @@
-package memory_util
+package util
 
 import (
 	"encoding/binary"

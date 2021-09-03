@@ -9,15 +9,14 @@ import (
 func main() {
 	engine := gin.Default()
 	engine.GET("/procs", controller.ProcList)
-	procEngine := engine.Group("/proc")
+	memoryEngine := engine.Group("/proc/:pid")
 	{
-		procEngine.GET("/mem_maps", controller.ProcMemMaps)
-	}
-	memoryEngine := engine.Group("/memory")
-	{
+		memoryEngine.GET("/mem_maps", controller.ProcMemMaps)
 		memoryEngine.POST("/write_int64", controller.WriteProcMemInt64)
 		memoryEngine.GET("/search_mem_int", controller.SearchMemInt)
 		memoryEngine.GET("/read_memory", controller.ReadMemory)
+		memoryEngine.GET("/addr2mem_map", controller.Addr2MemMap)
+
 	}
 	engine.Run()
 }
