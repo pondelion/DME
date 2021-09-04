@@ -20,3 +20,9 @@ type MemoryValue struct {
 	// MEMORY_VALUE []byte `json:"memory_value"`
 	MEMORY_VALUE string `json:"memory_value"`
 }
+
+type MemorySearchResult struct {
+	ADDR        uint64 `json:"addr"`
+	PATHNAME    string `json:"pathname"`
+	PERMISSIONS string `json:"permissions"`
+}

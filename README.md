@@ -1,9 +1,9 @@
 # DME
 
-## Build (android target)
+## Build (android/arm64 target)
 
 ```bash
-$ GOOS=linux GOARCH=arm64 GOARM=7 go build -o droid_dme_service
+$ GOOS=android GOARCH=arm64 GOARM=7 go build -o droid_dme_service
 ```
 
 ## Run API server on android

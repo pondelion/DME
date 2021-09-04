@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cheggaaa/pb/v3"
+
 	"dme_service/model"
 )
 
@@ -83,21 +85,48 @@ func SearchMemIntRange(pid int, value int64, addrStart uint64, addrEnd uint64) [
 	return searchMemIntRange(pid, value, addrStart, addrEnd)
 }
 
-func SearchMemInt(pid int, value int64) []uint64 {
+func SearchMemInt(pid int, value int64, max_section_size uint64) []model.MemorySearchResult {
 	// Search all memeory sections described in /proc/[pid]/maps.
 	memMaps := ParseMemMaps(pid)
-	var foundAddrs []uint64
+	var foundResults []model.MemorySearchResult
+	bar := pb.Simple.Start(len(memMaps.MEM_MAPS))
+	bar.SetMaxWidth(80)
+	SKIP_KEYWORDS := []string{
+		".jar", ".ttf", ".ttc", ".so", ".art", ".oat", ".apk", ".dat",
+	}
+L:
 	for _, memMap := range memMaps.MEM_MAPS {
+		bar.Increment()
+		fmt.Println(memMap.PATHNAME)
+		log.Printf("%s : %d", memMap.PATHNAME, memMap.ADDR_END-memMap.ADDR_START)
 		// If the memory section does not have read permission, skip searching.
 		if !strings.Contains(memMap.PERMISSIONS, "r") {
 			continue
 		}
-		foundAddrs = append(
-			foundAddrs,
-			searchMemIntRange(pid, value, memMap.ADDR_START, memMap.ADDR_END)...,
+		for _, skipKeyword := range SKIP_KEYWORDS {
+			if strings.Contains(memMap.PATHNAME, skipKeyword) {
+				continue L
+			}
+		}
+		if memMap.ADDR_END-memMap.ADDR_START > max_section_size {
+			continue
+		}
+		foundAddrs := searchMemIntRange(pid, value, memMap.ADDR_START, memMap.ADDR_END)
+		var results []model.MemorySearchResult
+		for _, addr := range foundAddrs {
+			results = append(results, model.MemorySearchResult{
+				ADDR:        addr,
+				PATHNAME:    memMap.PATHNAME,
+				PERMISSIONS: memMap.PERMISSIONS,
+			})
+		}
+		foundResults = append(
+			foundResults,
+			results...,
 		)
 	}
-	return foundAddrs
+	bar.Finish()
+	return foundResults
 }
 
 func searchMemIntRange(pid int, value int64, addrStart uint64, addrEnd uint64) []uint64 {

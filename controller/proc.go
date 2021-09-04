@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"runtime"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -20,10 +21,17 @@ func ProcList(c *gin.Context) {
 	// 		PACKAGE_NAME: "com.bbb",
 	// 	},
 	// }
-	procs := util.ProcessList()
-	c.JSON(http.StatusOK, gin.H{
-		"procs": procs,
-	})
+	if runtime.GOOS == "android" {
+		procs := util.ProcessListAndroid()
+		c.JSON(http.StatusOK, gin.H{
+			"procs": procs,
+		})
+	} else {
+		procs := util.ProcessList()
+		c.JSON(http.StatusOK, gin.H{
+			"procs": procs,
+		})
+	}
 }
 
 func ProcMemMaps(c *gin.Context) {

@@ -24,3 +24,21 @@ func ProcessList() []model.Proc {
 
 	return procs
 }
+
+func ProcessListAndroid() []model.ProcDroid {
+	processes, err := ps.Processes()
+
+	if err != nil {
+		panic(err)
+	}
+
+	var procs []model.ProcDroid
+	for _, p := range processes {
+		procs = append(procs, model.ProcDroid{
+			PID:          p.Pid(),
+			PPID:         p.PPid(),
+			PACKAGE_NAME: p.Executable(),
+		})
+	}
+	return procs
+}

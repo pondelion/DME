@@ -53,15 +53,21 @@ func SearchMemInt(c *gin.Context) {
 	)
 	value, _ := strconv.ParseInt(c.Query("value"), 10, 64)
 
-	var foundAddrs []uint64
 	if addr_start != 0 && addr_end != 0 {
-		foundAddrs = util.SearchMemIntRange(pid, value, addr_start, addr_end)
+		foundAddrs := util.SearchMemIntRange(pid, value, addr_start, addr_end)
+		c.JSON(http.StatusOK, gin.H{
+			"results": foundAddrs,
+		})
 	} else {
-		foundAddrs = util.SearchMemInt(pid, value)
+		maxSectionSize, _ := strconv.ParseUint(
+			c.DefaultQuery("max_section_size", "10000000"),
+			10, 64,
+		)
+		foundResults := util.SearchMemInt(pid, value, maxSectionSize)
+		c.JSON(http.StatusOK, gin.H{
+			"results": foundResults,
+		})
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"results": foundAddrs,
-	})
 }
 
 func ReadMemory(c *gin.Context) {
